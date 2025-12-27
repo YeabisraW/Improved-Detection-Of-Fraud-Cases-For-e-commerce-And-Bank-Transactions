@@ -1,152 +1,148 @@
-# =========================================
-# TASK 2 – MODEL BUILDING & TRAINING
-# =========================================
+# ---------------------------------------------
+# Task 2: Model Building, Training, and Logging
+# ---------------------------------------------
 
+import os
 import pandas as pd
 import numpy as np
+import joblib
 import matplotlib.pyplot as plt
-import seaborn as sns
+import shap
 
-from sklearn.model_selection import train_test_split, StratifiedKFold, cross_val_score
-from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import (
-    confusion_matrix,
-    classification_report,
-    f1_score,
-    average_precision_score
-)
+from xgboost import XGBClassifier
+from sklearn.metrics import f1_score, precision_recall_curve, auc, confusion_matrix, classification_report
+from sklearn.model_selection import StratifiedKFold
+import warnings
 
-from imblearn.over_sampling import SMOTE
-from imblearn.pipeline import Pipeline
+warnings.filterwarnings("ignore")
+plt.switch_backend('agg')  # Non-interactive backend
 
-# -----------------------------------------
-# 1. LOAD DATA
-# -----------------------------------------
+# -------------------------------
+# Helper Functions
+# -------------------------------
 
-# E-commerce fraud data
-fraud = pd.read_csv("data/raw/Fraud_Data.csv")
+def pr_auc_score(y_true, y_probs):
+    precision, recall, _ = precision_recall_curve(y_true, y_probs)
+    return auc(recall, precision)
 
-# Credit card fraud data
-credit = pd.read_csv("data/raw/creditcard.csv")
+def cross_val_f1(model, X, y, cv=5):
+    skf = StratifiedKFold(n_splits=cv, shuffle=True, random_state=42)
+    f1_scores = []
+    for train_idx, val_idx in skf.split(X, y):
+        X_train, X_val = X.iloc[train_idx], X.iloc[val_idx]
+        y_train, y_val = y.iloc[train_idx], y.iloc[val_idx]
+        model.fit(X_train, y_train)
+        y_pred = model.predict(X_val)
+        f1_scores.append(f1_score(y_val, y_pred))
+    return f1_scores
 
-print("Datasets loaded successfully")
+def evaluate_model(model, X_test, y_test):
+    y_pred = model.predict(X_test)
+    if hasattr(model, "predict_proba"):
+        y_prob = model.predict_proba(X_test)[:,1]
+    else:
+        y_prob = y_pred
+    f1 = f1_score(y_test, y_pred)
+    pr_auc = pr_auc_score(y_test, y_prob)
+    cm = confusion_matrix(y_test, y_pred)
+    report = classification_report(y_test, y_pred)
+    return f1, pr_auc, cm, report
 
-# -----------------------------------------
-# 2. BASIC PREPROCESSING
-# -----------------------------------------
+def plot_shap_feature_importance(model, X, dataset_name):
+    print("\nGenerating SHAP feature importance...")
+    if isinstance(model, LogisticRegression):
+        explainer = shap.LinearExplainer(model, X, feature_perturbation="correlation_dependent")
+    else:
+        explainer = shap.TreeExplainer(model)
+    shap_values = explainer.shap_values(X)
+    plt.figure(figsize=(10,6))
+    shap.summary_plot(shap_values, X, plot_type="bar", show=False)
+    plt.title(f"SHAP Feature Importance: {dataset_name}")
+    os.makedirs("../plots", exist_ok=True)
+    plt.savefig(f"../plots/shap_feature_importance_{dataset_name.replace(' ', '_').lower()}.png", bbox_inches='tight')
+    plt.close()
+    print(f"Saved SHAP plot for {dataset_name}")
 
-# -------- E-commerce --------
-fraud['signup_time'] = pd.to_datetime(fraud['signup_time'])
-fraud['purchase_time'] = pd.to_datetime(fraud['purchase_time'])
+def train_and_select_best(X_train, X_test, y_train, y_test, dataset_name="dataset", log_metrics=True):
+    print(f"\n========== {dataset_name} ==========\n")
 
-fraud['hour'] = fraud['purchase_time'].dt.hour
-fraud['dayofweek'] = fraud['purchase_time'].dt.dayofweek
-fraud['time_since_signup'] = (
-    fraud['purchase_time'] - fraud['signup_time']
-).dt.total_seconds() / 3600
+    models = {
+        "Logistic Regression": LogisticRegression(max_iter=1000),
+        "Random Forest": RandomForestClassifier(n_estimators=100, max_depth=7, random_state=42),
+        "XGBoost": XGBClassifier(n_estimators=100, max_depth=5, use_label_encoder=False, eval_metric='logloss', random_state=42)
+    }
 
-fraud = fraud.drop(columns=['signup_time', 'purchase_time', 'ip_address', 'user_id', 'device_id'])
+    results = []
+    best_model = None
+    best_model_name = None
+    best_f1 = 0
 
-fraud = pd.get_dummies(fraud, drop_first=True)
+    for name, model in models.items():
+        print(f"\nTraining {name}...")
+        model.fit(X_train, y_train)
+        f1, pr_auc, cm, report = evaluate_model(model, X_test, y_test)
+        cv_f1_scores = cross_val_f1(model, X_train, y_train, cv=5)
 
-X_fraud = fraud.drop('class', axis=1)
-y_fraud = fraud['class']
+        print(f"\n--- {dataset_name} Model Evaluation ---")
+        print(f"F1 Score: {f1:.4f}")
+        print(f"PR-AUC: {pr_auc:.4f}")
+        print("Confusion Matrix:\n", cm)
+        print("\nClassification Report:\n", report)
+        print(f"Cross-Validation F1 Scores: {cv_f1_scores}")
+        print(f"Mean CV F1: {np.mean(cv_f1_scores):.4f}, Std: {np.std(cv_f1_scores):.4f}")
 
-# -------- Credit card --------
-X_credit = credit.drop('Class', axis=1)
-y_credit = credit['Class']
+        results.append({
+            "Dataset": dataset_name,
+            "Model": name,
+            "F1_Test": f1,
+            "PR-AUC": pr_auc,
+            "CV_F1_Mean": np.mean(cv_f1_scores),
+            "CV_F1_Std": np.std(cv_f1_scores)
+        })
 
-# -----------------------------------------
-# 3. TRAIN–TEST SPLIT (STRATIFIED)
-# -----------------------------------------
+        if f1 > best_f1:
+            best_f1 = f1
+            best_model_name = name
+            best_model = model
 
-Xf_train, Xf_test, yf_train, yf_test = train_test_split(
-    X_fraud, y_fraud, test_size=0.2, stratify=y_fraud, random_state=42
-)
+    # Save best model
+    model_dir = "../models"
+    os.makedirs(model_dir, exist_ok=True)
+    model_path = os.path.join(model_dir, f"best_model_{dataset_name.replace(' ', '_').lower()}.joblib")
+    joblib.dump(best_model, model_path)
+    print(f"\n✅ Best Model: {best_model_name}")
+    print(f"Saved best model to {model_path}")
 
-Xc_train, Xc_test, yc_train, yc_test = train_test_split(
-    X_credit, y_credit, test_size=0.2, stratify=y_credit, random_state=42
-)
+    # SHAP plot
+    plot_shap_feature_importance(best_model, X_train, dataset_name)
 
-# -----------------------------------------
-# 4. BASELINE MODEL – LOGISTIC REGRESSION
-# -----------------------------------------
+    # Save metrics to CSV
+    if log_metrics:
+        metrics_dir = "../metrics"
+        os.makedirs(metrics_dir, exist_ok=True)
+        metrics_path = os.path.join(metrics_dir, f"model_metrics_{dataset_name.replace(' ', '_').lower()}.csv")
+        pd.DataFrame(results).to_csv(metrics_path, index=False)
+        print(f"Saved model metrics to {metrics_path}")
 
-log_pipeline = Pipeline([
-    ('scaler', StandardScaler()),
-    ('smote', SMOTE(random_state=42)),
-    ('model', LogisticRegression(max_iter=1000))
-])
+    return best_model_name, best_model
 
-log_pipeline.fit(Xf_train, yf_train)
-yf_pred = log_pipeline.predict(Xf_test)
-yf_proba = log_pipeline.predict_proba(Xf_test)[:, 1]
+# -------------------------------
+# Load preprocessed datasets
+# -------------------------------
+X_train_f = pd.read_csv("data/processed/X_train_fraud.csv")
+X_test_f = pd.read_csv("data/processed/X_test_fraud.csv")
+y_train_f = pd.read_csv("data/processed/y_train_fraud.csv").squeeze()
+y_test_f = pd.read_csv("data/processed/y_test_fraud.csv").squeeze()
 
-print("\n--- Logistic Regression (E-commerce) ---")
-print("F1-score:", f1_score(yf_test, yf_pred))
-print("AUC-PR:", average_precision_score(yf_test, yf_proba))
-print(confusion_matrix(yf_test, yf_pred))
+X_train_c = pd.read_csv("data/processed/X_train_credit.csv")
+X_test_c = pd.read_csv("data/processed/X_test_credit.csv")
+y_train_c = pd.read_csv("data/processed/y_train_credit.csv").squeeze()
+y_test_c = pd.read_csv("data/processed/y_test_credit.csv").squeeze()
 
-# -----------------------------------------
-# 5. ENSEMBLE MODEL – RANDOM FOREST
-# -----------------------------------------
-
-rf_pipeline = Pipeline([
-    ('smote', SMOTE(random_state=42)),
-    ('model', RandomForestClassifier(
-        n_estimators=200,
-        max_depth=10,
-        random_state=42,
-        n_jobs=-1
-    ))
-])
-
-rf_pipeline.fit(Xf_train, yf_train)
-rf_pred = rf_pipeline.predict(Xf_test)
-rf_proba = rf_pipeline.predict_proba(Xf_test)[:, 1]
-
-print("\n--- Random Forest (E-commerce) ---")
-print("F1-score:", f1_score(yf_test, rf_pred))
-print("AUC-PR:", average_precision_score(yf_test, rf_proba))
-print(confusion_matrix(yf_test, rf_pred))
-
-# -----------------------------------------
-# 6. STRATIFIED CROSS-VALIDATION
-# -----------------------------------------
-
-skf = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
-
-cv_f1 = cross_val_score(
-    rf_pipeline, X_fraud, y_fraud,
-    scoring='f1', cv=skf
-)
-
-cv_aucpr = cross_val_score(
-    rf_pipeline, X_fraud, y_fraud,
-    scoring='average_precision', cv=skf
-)
-
-print("\n--- Cross Validation (Random Forest) ---")
-print(f"F1-score: {cv_f1.mean():.4f} ± {cv_f1.std():.4f}")
-print(f"AUC-PR:   {cv_aucpr.mean():.4f} ± {cv_aucpr.std():.4f}")
-
-# -----------------------------------------
-# 7. MODEL COMPARISON SUMMARY
-# -----------------------------------------
-
-results = pd.DataFrame({
-    'Model': ['Logistic Regression', 'Random Forest'],
-    'F1-score': [
-        f1_score(yf_test, yf_pred),
-        f1_score(yf_test, rf_pred)
-    ],
-    'AUC-PR': [
-        average_precision_score(yf_test, yf_proba),
-        average_precision_score(yf_test, rf_proba)
-    ]
-})
-
-print("\nModel Comparison:")
-print(results)
+# -------------------------------
+# Train and evaluate models
+# -------------------------------
+train_and_select_best(X_train_f, X_test_f, y_train_f, y_test_f, dataset_name="E-commerce Dataset")
+train_and_select_best(X_train_c, X_test_c, y_train_c, y_test_c, dataset_name="Credit Card Dataset")
