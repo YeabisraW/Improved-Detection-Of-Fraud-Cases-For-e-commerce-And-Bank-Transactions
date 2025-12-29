@@ -12,3 +12,4 @@ __pycache__/
 # Virtual environments
 .venv/
 models/*.joblib
+models/*.joblib
