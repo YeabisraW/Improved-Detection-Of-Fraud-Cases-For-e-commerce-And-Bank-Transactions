@@ -54,7 +54,6 @@ def preprocess_ecommerce(df):
     df.drop(['user_id','signup_time','purchase_time','device_id','ip_address'], axis=1, inplace=True, errors='ignore')
 
     return df
-
 def preprocess_creditcard(df):
     # Drop columns not needed
     df = df.copy()
