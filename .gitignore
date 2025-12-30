@@ -12,4 +12,6 @@ __pycache__/
 # Virtual environments
 .venv/
 models/*.joblib
-models/*.joblib
+# Ignore large ML artifacts
+reports/*.npy
+
