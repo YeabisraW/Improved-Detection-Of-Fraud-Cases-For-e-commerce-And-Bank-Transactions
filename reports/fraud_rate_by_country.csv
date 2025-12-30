@@ -1,0 +1,183 @@
+country,fraud_rate
+Turkmenistan,1.0
+Namibia,0.43478260869565216
+Sri Lanka,0.41935483870967744
+Luxembourg,0.3888888888888889
+Virgin Islands (U.S.),0.3333333333333333
+Ecuador,0.2641509433962264
+Tunisia,0.2627118644067797
+Peru,0.2605042016806723
+Bolivia,0.24528301886792453
+Kuwait,0.23333333333333334
+Ireland,0.22916666666666666
+New Zealand,0.22302158273381295
+Uzbekistan,0.2
+Lithuania,0.18947368421052632
+Saudi Arabia,0.1893939393939394
+Malta,0.18181818181818182
+Cote D'ivoire,0.16666666666666666
+Afghanistan,0.16666666666666666
+Denmark,0.15918367346938775
+Chile,0.15347721822541965
+Greece,0.14285714285714285
+Montenegro,0.14285714285714285
+Malawi,0.14285714285714285
+United Arab Emirates,0.14035087719298245
+Belgium,0.13691931540342298
+Egypt,0.13370473537604458
+Costa Rica,0.13333333333333333
+Armenia,0.13333333333333333
+Venezuela,0.13147410358565736
+Norway,0.1297208538587849
+Hong Kong,0.12951167728237792
+Mexico,0.12845673505798394
+Seychelles,0.12631578947368421
+Sweden,0.12018348623853212
+Canada,0.11697478991596638
+Ukraine,0.11655011655011654
+India,0.11526717557251909
+Honduras,0.1111111111111111
+Senegal,0.1111111111111111
+Iran (ISLAMIC Republic Of),0.10796915167095116
+Lebanon,0.10714285714285714
+Algeria,0.10655737704918032
+United Kingdom,0.10623608017817372
+Iceland,0.10526315789473684
+Argentina,0.09984871406959153
+Japan,0.09786476868327403
+Czech Republic,0.09742120343839542
+Finland,0.09565217391304348
+United States,0.09562610897689883
+France,0.09490667510281557
+Latvia,0.09375
+Korea Republic of,0.0913022585295531
+Brazil,0.0911854103343465
+Trinidad and Tobago,0.09090909090909091
+Hungary,0.09004739336492891
+Australia,0.08947939262472886
+Croatia (LOCAL Name: Hrvatska),0.08860759493670886
+South Africa,0.0883054892601432
+Switzerland,0.08789808917197452
+Indonesia,0.08782742681047766
+Azerbaijan,0.08695652173913043
+China,0.08664229938527995
+Unknown,0.08572339069471001
+Paraguay,0.08571428571428572
+Italy,0.08539094650205761
+Russian Federation,0.08292079207920793
+Bangladesh,0.08108108108108109
+Taiwan; Republic of China (ROC),0.08003233629749394
+Sudan,0.08
+El Salvador,0.08
+Austria,0.07586206896551724
+Kenya,0.07526881720430108
+Turkey,0.07394366197183098
+Netherlands,0.07321428571428572
+Germany,0.0718595721338453
+Libyan Arab Jamahiriya,0.07142857142857142
+Spain,0.07108081791626096
+Singapore,0.0673076923076923
+Viet Nam,0.06727272727272728
+Thailand,0.06529209621993128
+Kazakhstan,0.06521739130434782
+Nicaragua,0.0625
+Georgia,0.0625
+Uruguay,0.0625
+Colombia,0.059800664451827246
+European Union,0.058823529411764705
+Mauritius,0.058823529411764705
+Philippines,0.05649717514124294
+Moldova Republic of,0.05405405405405406
+Poland,0.053497942386831275
+Malaysia,0.05238095238095238
+Romania,0.05142857142857143
+Guatemala,0.05
+Panama,0.04838709677419355
+Cyprus,0.046511627906976744
+Slovakia (SLOVAK Republic),0.046511627906976744
+Nigeria,0.04477611940298507
+Israel,0.04411764705882353
+Portugal,0.043668122270742356
+Pakistan,0.043010752688172046
+Macedonia,0.041666666666666664
+Angola,0.041666666666666664
+Dominican Republic,0.0392156862745098
+Bosnia and Herzegowina,0.03333333333333333
+Morocco,0.03164556962025317
+Belarus,0.027777777777777776
+Estonia,0.023809523809523808
+Slovenia,0.022988505747126436
+Serbia,0.014492753623188406
+Bulgaria,0.012048192771084338
+Bhutan,0.0
+Bahrain,0.0
+Bahamas,0.0
+Belize,0.0
+Benin,0.0
+Bermuda,0.0
+Antigua and Barbuda,0.0
+Albania,0.0
+Djibouti,0.0
+Dominica,0.0
+Cuba,0.0
+Curacao,0.0
+Congo,0.0
+Congo The Democratic Republic of The,0.0
+Cambodia,0.0
+Botswana,0.0
+Burundi,0.0
+Burkina Faso,0.0
+Brunei Darussalam,0.0
+British Indian Ocean Territory,0.0
+Cape Verde,0.0
+Cameroon,0.0
+Cayman Islands,0.0
+Bonaire; Sint Eustatius; Saba,0.0
+Barbados,0.0
+Guadeloupe,0.0
+Faroe Islands,0.0
+Guam,0.0
+Gambia,0.0
+Ethiopia,0.0
+Fiji,0.0
+Gabon,0.0
+Haiti,0.0
+Ghana,0.0
+Gibraltar,0.0
+Lao People's Democratic Republic,0.0
+Macau,0.0
+Iraq,0.0
+Jamaica,0.0
+Jordan,0.0
+Nepal,0.0
+Nauru,0.0
+Myanmar,0.0
+Mozambique,0.0
+Mongolia,0.0
+Monaco,0.0
+Maldives,0.0
+Madagascar,0.0
+Liechtenstein,0.0
+Lesotho,0.0
+Kyrgyzstan,0.0
+New Caledonia,0.0
+Oman,0.0
+Niger,0.0
+Papua New Guinea,0.0
+Palestinian Territory Occupied,0.0
+San Marino,0.0
+Saint Martin,0.0
+Rwanda,0.0
+Puerto Rico,0.0
+Reunion,0.0
+Qatar,0.0
+Saint Kitts and Nevis,0.0
+South Sudan,0.0
+Tajikistan,0.0
+Syrian Arab Republic,0.0
+Tanzania United Republic of,0.0
+Uganda,0.0
+Vanuatu,0.0
+Yemen,0.0
+Zambia,0.0
+Zimbabwe,0.0
