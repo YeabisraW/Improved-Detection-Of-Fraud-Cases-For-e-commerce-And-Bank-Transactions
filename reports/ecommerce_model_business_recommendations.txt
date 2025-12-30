@@ -1,0 +1,10 @@
+BUSINESS STRATEGY REPORT: ECOMMERCE_MODEL
+========================================
+- [UX CHANGE]: account_age_hours indicates anomalous behavior. ACTION: If high-risk timing is detected, enforce biometric verification (face/thumbprint) before finalizing checkout.
+- [RULE REFINEMENT]: browser_Chrome impact detected. ACTION: Integrate browser_Chrome into the real-time scoring engine with a higher weight to improve precision.
+- [RULE REFINEMENT]: source_SEO impact detected. ACTION: Integrate source_SEO into the real-time scoring engine with a higher weight to improve precision.
+- [RULE REFINEMENT]: sex_M impact detected. ACTION: Integrate sex_M into the real-time scoring engine with a higher weight to improve precision.
+- [UX CHANGE]: purchase_hour indicates anomalous behavior. ACTION: If high-risk timing is detected, enforce biometric verification (face/thumbprint) before finalizing checkout.
+
+NARRATIVE CONTRAST:
+The model's built-in Gini Importance identifies 'account_age_hours' as the top feature for node splitting. While Gini captures global relevance, it lacks directional insight. In contrast, SHAP analysis identifies 'account_age_hours' as the most critical driver of actual fraud probability. SHAP allows us to see how feature values directly push a prediction toward fraud, enabling the targeted controls (like Biometrics and OTP) listed above, whereas built-in importance only highlights raw predictive power.

@@ -9,6 +9,7 @@ Covers:
 Outputs:
 - Fraud by Country analysis (CSV + Top 10 plot)
 - Cleaned & resampled datasets ready for modeling
+- Saved feature names for Task 2 SHAP explainability
 """
 
 import pandas as pd
@@ -135,6 +136,22 @@ preprocessor = ColumnTransformer(
     ]
 )
 
+# Save feature names for Task 2
+# Numeric features first, then OneHotEncoder categories
+X_dummy = preprocessor.fit_transform(X_ecom[:1])
+feature_names = []
+
+# Numeric
+feature_names.extend(num_features)
+
+# Categorical
+ohe = preprocessor.named_transformers_["cat"]
+cat_ohe_features = ohe.get_feature_names_out(cat_features)
+feature_names.extend(cat_ohe_features)
+
+# Save to CSV
+pd.DataFrame({"feature": feature_names}).to_csv(REPORT_DIR / "ecom_feature_names.csv", index=False)
+
 # -----------------------------
 # Train-Test Split
 # -----------------------------
@@ -149,12 +166,15 @@ X_train_c, X_test_c, y_train_c, y_test_c = train_test_split(
 # -----------------------------
 # Apply Preprocessing
 # -----------------------------
-X_train_e = preprocessor.fit_transform(X_train_e)
+X_train_e = preprocessor.transform(X_train_e)
 X_test_e = preprocessor.transform(X_test_e)
 
 scaler_cc = StandardScaler()
 X_train_c = scaler_cc.fit_transform(X_train_c)
 X_test_c = scaler_cc.transform(X_test_c)
+
+# Save CC feature names
+pd.DataFrame({"feature": X_cc.columns}).to_csv(REPORT_DIR / "cc_feature_names.csv", index=False)
 
 # -----------------------------
 # Apply SMOTE

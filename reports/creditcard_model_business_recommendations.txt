@@ -1,0 +1,10 @@
+BUSINESS STRATEGY REPORT: CREDITCARD_MODEL
+========================================
+- [RULE REFINEMENT]: V14 impact detected. ACTION: Integrate V14 into the real-time scoring engine with a higher weight to improve precision.
+- [RULE REFINEMENT]: V12 impact detected. ACTION: Integrate V12 into the real-time scoring engine with a higher weight to improve precision.
+- [RULE REFINEMENT]: V4 impact detected. ACTION: Integrate V4 into the real-time scoring engine with a higher weight to improve precision.
+- [RULE REFINEMENT]: V10 impact detected. ACTION: Integrate V10 into the real-time scoring engine with a higher weight to improve precision.
+- [RULE REFINEMENT]: V17 impact detected. ACTION: Integrate V17 into the real-time scoring engine with a higher weight to improve precision.
+
+NARRATIVE CONTRAST:
+The model's built-in Gini Importance identifies 'V14' as the top feature for node splitting. While Gini captures global relevance, it lacks directional insight. In contrast, SHAP analysis identifies 'V14' as the most critical driver of actual fraud probability. SHAP allows us to see how feature values directly push a prediction toward fraud, enabling the targeted controls (like Biometrics and OTP) listed above, whereas built-in importance only highlights raw predictive power.
